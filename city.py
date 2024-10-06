@@ -107,16 +107,6 @@ def get_neighbour_cells_improved_without_visited_cells(cell, grid_r, grid_c, vis
     return neighbour_cells
 
 
-def get_least_cell_value(current_value, cells, grid):
-    min = -1
-    new_cell = cells[0]
-    for r, c in cells:
-        if grid[r][c] + current_value < min:
-            min = grid[r][c] + current_value
-            new_cell = (r, c)
-    return min, new_cell
-
-
 def get_minimum_value_cell(cost_table, visited_cell):
     min = sys.maxsize
     min_cell = (-1, -1)
@@ -124,7 +114,6 @@ def get_minimum_value_cell(cost_table, visited_cell):
         if not visited_cell[cell[0]][cell[1]] and value < min:
             min = value
             min_cell = cell
-
 
     return min_cell
 
@@ -142,7 +131,7 @@ def dijkstra(grid_info, grid):
     c = grid_info[COLUMN_INDEX]
     start_cell_indices = grid_info[START_INDECIES[0]] - 1, grid_info[START_INDECIES[1]] - 1
     money = grid_info[MONEY_INDEX]
-    end_cell_indices = grid_info[END_INDECIES[0]], grid_info[END_INDECIES[1]]
+    end_cell_indices = grid_info[END_INDECIES[0]] - 1, grid_info[END_INDECIES[1]] - 1
 
     cost_table = {}
 
@@ -157,7 +146,7 @@ def dijkstra(grid_info, grid):
     src_value = 0
     # O(V^2)
     i = 0
-    while i < (r * c)-1:
+    while src != (-1, -1) and i < (r * c) - 1:
         visited_cells[src[0]][src[1]] = True
 
         cells = get_neighbour_cells_improved_without_visited_cells(src, r, c, visited_cells)
@@ -166,8 +155,11 @@ def dijkstra(grid_info, grid):
 
         src = get_minimum_value_cell(cost_table, visited_cells)
         src_value = cost_table[src]
+
         i += 1
-    return cost_table
+
+    result = money -cost_table[end_cell_indices]
+    return result if  result > 0 else -1
 
 
 def test():
@@ -196,7 +188,7 @@ def run():
             row = [int(num) for num in input().strip().split()]
             grid[i] = row
 
-        city(grid_info, grid)
+        dijkstra(grid_info, grid)
 
 
 test()
